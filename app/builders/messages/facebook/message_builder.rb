@@ -74,7 +74,8 @@ class Messages::Facebook::MessageBuilder < Messages::Messenger::MessageBuilder
 
   def build_conversation
     Conversation.create!(conversation_params.merge(
-                           contact_inbox_id: @contact_inbox.id
+                           contact_inbox_id: @contact_inbox.id,
+                           additional_attributes: enso_referral_attributes(@response.referral)
                          ))
   end
 

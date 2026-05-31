@@ -109,6 +109,24 @@ class Messages::Messenger::MessageBuilder
 
   private
 
+  # ENSO: normalize a Meta `referral` object (ref / ad_id / source / type /
+  # ads_context_data) into conversation additional_attributes so ad attribution
+  # flows through the conversation webhook to the CRM intake. Returns {} when absent.
+  def enso_referral_attributes(referral)
+    return {} if referral.blank?
+
+    ref = referral.respond_to?(:with_indifferent_access) ? referral.with_indifferent_access : referral
+    {
+      'referral' => {
+        'ref' => ref['ref'],
+        'ad_id' => ref['ad_id'],
+        'source' => ref['source'],
+        'type' => ref['type'],
+        'ads_context_data' => ref['ads_context_data']
+      }.compact
+    }
+  end
+
   # Facebook may send attachment types that don't directly match our file_type enum.
   # Map known aliases to their canonical enum values.
   FACEBOOK_FILE_TYPE_MAP = { reel: :ig_reel }.freeze

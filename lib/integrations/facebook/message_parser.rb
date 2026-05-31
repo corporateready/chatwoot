@@ -67,6 +67,12 @@ class Integrations::Facebook::MessageParser
   def in_reply_to_external_id
     @messaging.dig('message', 'reply_to', 'mid')
   end
+
+  # ENSO: Meta ad referral (Click-to-Messenger ads / m.me?ref / postback referral).
+  # Chatwoot core ignores this; we surface it so the CRM intake can attribute ads.
+  def referral
+    @messaging['referral'] || @messaging.dig('postback', 'referral')
+  end
 end
 
 # Sample Response
