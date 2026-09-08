@@ -50,8 +50,13 @@ class Channel::FacebookPage < ApplicationRecord
     # ref https://developers.facebook.com/docs/messenger-platform/reference/webhook-events
     Facebook::Messenger::Subscriptions.subscribe(
       access_token: page_access_token,
+      # ENSO: messaging_referrals carries the Meta ad referral (ref/ad_id) when a
+      # contact returns to an existing thread from a Click-to-Messenger ad or an
+      # m.me?ref link. Without it that click reaches us untagged and the CRM
+      # reports the lead as organic. See PATCH 1 (enso_referral_attributes).
       subscribed_fields: %w[
         messages message_deliveries message_echoes message_reads standby messaging_handovers
+        messaging_referrals
       ]
     )
   rescue StandardError => e
