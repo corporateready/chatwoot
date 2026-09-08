@@ -47,7 +47,10 @@ class Channel::Instagram < ApplicationRecord
     HTTParty.post(
       "https://graph.instagram.com/v22.0/#{instagram_id}/subscribed_apps",
       query: {
-        subscribed_fields: %w[messages message_reactions messaging_seen],
+        # ENSO: messaging_referral is the Instagram ad-referral field (ads that
+        # click to Direct); core Chatwoot omits it, so ad attribution never
+        # arrives. See PATCH 1 (enso_referral_attributes).
+        subscribed_fields: %w[messages message_reactions messaging_seen messaging_referral],
         access_token: access_token
       }
     )
