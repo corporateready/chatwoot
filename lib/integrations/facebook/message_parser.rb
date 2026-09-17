@@ -70,8 +70,14 @@ class Integrations::Facebook::MessageParser
 
   # ENSO: Meta ad referral (Click-to-Messenger ads / m.me?ref / postback referral).
   # Chatwoot core ignores this; we surface it so the CRM intake can attribute ads.
+  #
+  # `message.referral` FIRST and it is the one that actually fires: on an ad-initiated
+  # thread Meta nests the referral INSIDE the message, not beside it. Reading only the
+  # top level silently attributed every click-to-Messenger lead as organic.
   def referral
-    @messaging['referral'] || @messaging.dig('postback', 'referral')
+    @messaging.dig('message', 'referral') ||
+      @messaging['referral'] ||
+      @messaging.dig('postback', 'referral')
   end
 end
 
