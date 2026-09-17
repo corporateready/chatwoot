@@ -143,7 +143,13 @@ class Messages::Instagram::BaseMessageBuilder < Messages::Messenger::MessageBuil
 
   def additional_conversation_attributes
     # ENSO: capture Meta ad referral on Instagram CTM/ad-initiated conversations.
-    enso_referral_attributes(@messaging[:referral] || @messaging.dig(:postback, :referral))
+    # `message.referral` FIRST and it is the one that actually fires: on an
+    # ads-that-click-to-Direct thread Meta nests the referral INSIDE the message.
+    enso_referral_attributes(
+      @messaging.dig(:message, :referral) ||
+      @messaging[:referral] ||
+      @messaging.dig(:postback, :referral)
+    )
   end
 
   def conversation_params
