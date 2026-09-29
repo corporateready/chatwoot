@@ -125,10 +125,26 @@ class Messages::Facebook::MessageBuilder < Messages::Messenger::MessageBuilder
 
   def process_contact_params_result(result)
     {
-      name: "#{result['first_name'] || 'John'} #{result['last_name'] || 'Doe'}",
+      name: enso_contact_name(result),
       account_id: @inbox.account_id,
       avatar_url: result['profile_pic']
     }
+  end
+
+  # ENSO: core Chatwoot names every contact whose profile Meta withholds "John Doe".
+  # Meta withholds it for everyone without a role on the app until the app has
+  # Business Asset User Profile Access at Advanced Access (App Review), so on our
+  # pages that was every single Facebook contact — hundreds of identical names that
+  # agents could not tell apart. Fall back to something that is at least distinct:
+  # the tail of the PSID, which is stable per person per page. Six digits, not four:
+  # with a few hundred contacts four digits collide by the birthday bound.
+  # Once profile access is granted, real names flow in and a backfill replaces
+  # these placeholders (they are recognisable by the "Facebook lead ·" prefix).
+  def enso_contact_name(result)
+    real_name = [result['first_name'], result['last_name']].compact_blank.join(' ')
+    return real_name if real_name.present?
+
+    "Facebook lead ·#{@sender_id.to_s.last(6)}"
   end
 
   # rubocop:disable Metrics/AbcSize
