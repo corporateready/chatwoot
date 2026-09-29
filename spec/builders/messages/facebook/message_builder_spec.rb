@@ -53,7 +53,9 @@ describe Messages::Facebook::MessageBuilder do
 
       contact = facebook_channel.inbox.contacts.first
       # Refer: https://github.com/chatwoot/chatwoot/pull/3016 for this check
-      default_name = 'John Doe'
+      # ENSO: the fallback is a distinct placeholder built from the PSID's tail,
+      # not "John Doe" — see Messages::Facebook::MessageBuilder#enso_contact_name.
+      default_name = "Facebook lead ·#{contact.contact_inboxes.first.source_id.to_s.last(6)}"
 
       expect(facebook_channel.inbox.reload.contacts.count).to eq(1)
       expect(contact.name).to eq(default_name)
